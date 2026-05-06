@@ -475,9 +475,9 @@
          */
         let isSyncing = false;
 
-        // URL et Clé publique Supabase (remplace KVDB.io qui bloque désormais les accès anonymes)
-        const SUPABASE_URL = "https://bxdggpznexdvvcsbzixc.supabase.co/rest/v1/bingo_rooms";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4ZGdncHpuZXhkdnZjc2J6aXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDM4OTQsImV4cCI6MjA4OTAxOTg5NH0.CB5ftmAgxGgl8EelofINufliZppBuIkm636xMw55rwI";
+        // URL et Clé publique Supabase (Nouveau compte)
+        const SUPABASE_URL = "https://akkgnuoiribtmdignrrs.supabase.co/rest/v1/bingo_rooms";
+        const SUPABASE_KEY = "sb_publishable_tasuDon-Hak26e5QGCSytQ_i06LR-en";
 
         async function pushSync() {
             if (!state.settings.secretCode || !isAdmin) return; // Seul l'admin pousse les modifs pour éviter les conflits
