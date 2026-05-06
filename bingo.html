@@ -359,8 +359,8 @@
     <!-- PARAMETRES TAB -->
     <div id="tab-parametres" class="tab-content">
         <div class="settings-section">
-            <h2>Synchronisation Temps Réel (KVDB.io)</h2>
-            <p style="color: #bbb; font-size: 14px;">La synchronisation est sécurisée et préconfigurée.</p>
+            <h2>Synchronisation Temps Réel (Supabase)</h2>
+            <p style="color: #bbb; font-size: 14px;">KVDB.io ayant restreint ses accès gratuits, la base de données a été migrée sur ton serveur privé Supabase pour une synchronisation plus rapide, 100% fiable et sans limites.</p>
         </div>
 
         <div class="settings-section">
@@ -475,22 +475,34 @@
          */
         let isSyncing = false;
 
+        // URL et Clé publique Supabase (remplace KVDB.io qui bloque désormais les accès anonymes)
+        const SUPABASE_URL = "https://bxdggpznexdvvcsbzixc.supabase.co/rest/v1/bingo_rooms";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4ZGdncHpuZXhkdnZjc2J6aXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDM4OTQsImV4cCI6MjA4OTAxOTg5NH0.CB5ftmAgxGgl8EelofINufliZppBuIkm636xMw55rwI";
+
         async function pushSync() {
             if (!state.settings.secretCode || !isAdmin) return; // Seul l'admin pousse les modifs pour éviter les conflits
             isSyncing = true;
             try {
-                await fetch(`https://kvdb.io/${state.settings.secretCode}/bingoState`, {
-                    method: 'POST', // POST met à jour ou crée la clé
-                    headers: { 'Content-Type': 'application/json' },
+                await fetch(SUPABASE_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
                     body: JSON.stringify({
-                        grid: state.grid,
-                        checked: state.checked,
-                        words: state.words,
-                        timestamp: Date.now()
+                        room_hash: state.settings.secretCode,
+                        state: {
+                            grid: state.grid,
+                            checked: state.checked,
+                            words: state.words,
+                            timestamp: Date.now()
+                        }
                     })
                 });
             } catch (error) {
-                console.error("Erreur Push KVDB:", error);
+                console.error("Erreur Push Sync:", error);
             }
             isSyncing = false;
         }
@@ -498,51 +510,60 @@
         async function pullSync() {
             if (!state.settings.secretCode || isSyncing) return;
             try {
-                const response = await fetch(`https://kvdb.io/${state.settings.secretCode}/bingoState`);
+                const response = await fetch(`${SUPABASE_URL}?room_hash=eq.${state.settings.secretCode}&select=state`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
                 if (response.ok) {
-                    const data = await response.json();
-                    if (data && data.timestamp) {
-                        const localCheck = JSON.stringify(state.checked);
-                        const remoteCheck = JSON.stringify(data.checked);
-                        const localGrid = JSON.stringify(state.grid);
-                        const remoteGrid = JSON.stringify(data.grid);
-                        const localWords = JSON.stringify(state.words);
-                        const remoteWords = JSON.stringify(data.words || []);
-                        
-                        // Si l'état distant est différent
-                        if (localCheck !== remoteCheck || localGrid !== remoteGrid || localWords !== remoteWords) {
-                            state.grid = data.grid || state.grid;
-                            state.checked = data.checked || state.checked;
+                    const rows = await response.json();
+                    if (rows && rows.length > 0) {
+                        const data = rows[0].state;
+                        if (data && data.timestamp) {
+                            const localCheck = JSON.stringify(state.checked);
+                            const remoteCheck = JSON.stringify(data.checked);
+                            const localGrid = JSON.stringify(state.grid);
+                            const remoteGrid = JSON.stringify(data.grid);
+                            const localWords = JSON.stringify(state.words);
+                            const remoteWords = JSON.stringify(data.words || []);
                             
-                            if (localWords !== remoteWords && data.words) {
-                                state.words = data.words;
-                                renderWords();
-                            }
-                            
-                            // Vérification des sons (uniquement si la grille n'a pas été regénérée)
-                            if (localGrid === remoteGrid) {
-                                let newCompletedLines = getCompletedLinesCount();
-                                let localCheckedCount = (localCheck.match(/true/g) || []).length;
-                                let remoteCheckedCount = (remoteCheck.match(/true/g) || []).length;
-
-                                if (newCompletedLines > previousCompletedLines) {
-                                    if (state.checked.every(c => c)) playSound('win');
-                                    else playSound('line');
-                                } else if (remoteCheckedCount > localCheckedCount) {
-                                    playSound('click');
+                            // Si l'état distant est différent
+                            if (localCheck !== remoteCheck || localGrid !== remoteGrid || localWords !== remoteWords) {
+                                state.grid = data.grid || state.grid;
+                                state.checked = data.checked || state.checked;
+                                
+                                if (localWords !== remoteWords && data.words) {
+                                    state.words = data.words;
+                                    renderWords();
                                 }
-                                previousCompletedLines = newCompletedLines;
-                            } else {
-                                previousCompletedLines = getCompletedLinesCount();
+                                
+                                // Vérification des sons (uniquement si la grille n'a pas été regénérée)
+                                if (localGrid === remoteGrid) {
+                                    let newCompletedLines = getCompletedLinesCount();
+                                    let localCheckedCount = (localCheck.match(/true/g) || []).length;
+                                    let remoteCheckedCount = (remoteCheck.match(/true/g) || []).length;
+
+                                    if (newCompletedLines > previousCompletedLines) {
+                                        if (state.checked.every(c => c)) playSound('win');
+                                        else playSound('line');
+                                    } else if (remoteCheckedCount > localCheckedCount) {
+                                        playSound('click');
+                                    }
+                                    previousCompletedLines = newCompletedLines;
+                                } else {
+                                    previousCompletedLines = getCompletedLinesCount();
+                                }
+                                
+                                saveState();
+                                renderGrid();
                             }
-                            
-                            saveState();
-                            renderGrid();
                         }
                     }
                 }
             } catch (error) {
-                console.error("Erreur Pull KVDB:", error);
+                console.error("Erreur Pull Sync:", error);
             }
         }
 
