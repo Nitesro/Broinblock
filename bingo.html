@@ -830,6 +830,10 @@
                 }
             });
 
+            // Force empty state on start to fetch fresh from Supabase
+            state.grid = [];
+            state.checked = [];
+
             // Onglet liste de mots
             renderWords();
             renderGrid();
