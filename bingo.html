@@ -494,7 +494,7 @@
                         'Prefer': 'resolution=merge-duplicates'
                     },
                     body: JSON.stringify({
-                        room_hash: 'default_room',
+                        room_hash: state.settings.secretCode || TARGET_HASH,
                         state: {
                             grid: state.grid,
                             checked: state.checked,
@@ -510,8 +510,9 @@
 
         async function pullSync() {
             if (isSyncing || Date.now() - lastLocalActionTime < 2500) return;
+            const hashToQuery = state.settings.secretCode || TARGET_HASH;
             try {
-                const response = await fetch(`${SUPABASE_URL}/bingo_rooms?room_hash=eq.default_room&select=state`, {
+                const response = await fetch(`${SUPABASE_URL}/bingo_rooms?room_hash=eq.${hashToQuery}&select=state`, {
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -521,13 +522,13 @@
                     const rows = await response.json();
                     if (rows && rows.length > 0) {
                         const data = rows[0].state;
-                        if (data && data.timestamp) {
+                        if (data) {
                             const localCheck = JSON.stringify(state.checked);
                             const remoteCheck = JSON.stringify(data.checked || []);
                             const localGrid = JSON.stringify(state.grid);
                             const remoteGrid = JSON.stringify(data.grid || []);
 
-                            if (localCheck !== remoteCheck || localGrid !== remoteGrid) {
+                            if (localCheck !== remoteCheck || localGrid !== remoteGrid || state.grid.length === 0) {
                                 state.grid = data.grid || [];
                                 state.checked = data.checked || [];
                                 state.words = data.words || state.words;
