@@ -880,8 +880,10 @@
 
             // Onglet liste de mots
             renderWords();
-            renderGrid();
-            pullSync();
+            fetchImagesCache().then(() => {
+                renderGrid();
+                pullSync();
+            });
         };
 
         function renderWords() {
