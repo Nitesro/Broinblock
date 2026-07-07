@@ -346,7 +346,6 @@
         <button class="tab-btn" data-target="tab-upload">UPLOADER (SONS & VISUELS)</button>
         <button class="tab-btn hidden admin-only" data-target="tab-modifier">MODIFIER LES MOTS</button>
         <button class="tab-btn hidden admin-only" data-target="tab-parametres">PARAMÈTRES ADMIN</button>
-        <button class="tab-btn hidden admin-only" data-target="tab-moderation">MODÉRER MÉDIAS</button>
     </nav>
 
     <!-- CELEBRATION OVERLAY -->
@@ -365,34 +364,27 @@
 
     <!-- UPLOAD TAB -->
     <div id="tab-upload" class="tab-content">
-        <!-- Section Connexion Twitch Obligatoire -->
-        <div class="settings-section" id="twitch-login-section">
-            <!-- Rempli dynamiquement -->
-        </div>
-
-        <div id="upload-form-wrapper" class="hidden">
-            <div class="settings-section">
-                <h2>Uploader un effet sonore (MP3 / WAV)</h2>
-                <div class="file-upload">
-                    <label style="width: 100%; margin-bottom: 5px;">Type d'action déclenchant le son :</label>
-                    <select id="sound-type-selector" style="margin-bottom: 15px; max-width: 300px;">
-                        <option value="click">Clic sur une case</option>
-                        <option value="line">Ligne/Diagonale complétée</option>
-                        <option value="win">Bingo Complet (Grille pleine)</option>
-                    </select>
-                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                        <input type="file" id="sound-uploader" accept="audio/*">
-                        <button class="action-btn" id="sound-upload-btn">Envoyer le Son</button>
-                    </div>
+        <div class="settings-section">
+            <h2>Uploader un effet sonore (MP3 / WAV)</h2>
+            <div class="file-upload">
+                <label style="width: 100%; margin-bottom: 5px;">Type d'action déclenchant le son :</label>
+                <select id="sound-type-selector" style="margin-bottom: 15px; max-width: 300px;">
+                    <option value="click">Clic sur une case</option>
+                    <option value="line">Ligne/Diagonale complétée</option>
+                    <option value="win">Bingo Complet (Grille pleine)</option>
+                </select>
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <input type="file" id="sound-uploader" accept="audio/*">
+                    <button class="action-btn" id="sound-upload-btn">Envoyer le Son</button>
                 </div>
             </div>
+        </div>
 
-            <div class="settings-section">
-                <h2>Uploader un visuel de célébration (PNG / JPG / GIF)</h2>
-                <div class="file-upload">
-                    <input type="file" id="image-uploader" accept="image/*">
-                    <button class="action-btn" id="image-upload-btn">Envoyer le Visuel</button>
-                </div>
+        <div class="settings-section">
+            <h2>Uploader un visuel de célébration (PNG / JPG / GIF)</h2>
+            <div class="file-upload">
+                <input type="file" id="image-uploader" accept="image/*">
+                <button class="action-btn" id="image-upload-btn">Envoyer le Visuel</button>
             </div>
         </div>
     </div>
@@ -435,29 +427,11 @@
         </div>
     </div>
 
-    <!-- MODERATION TAB -->
-    <div id="tab-moderation" class="tab-content admin-only hidden">
-        <div class="settings-section">
-            <h2>🛡️ MODÉRATION DES VISUELS & EFFETS SONORES</h2>
-            <p style="color: #aaa; margin-top: -5px; font-size: 14px;">Supprimez les fichiers indésirables ou non conformes.</p>
-        </div>
-        
-        <div class="settings-section">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">📸 Images de célébration</h2>
-            <div id="mod-images-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-        
-        <div class="settings-section">
-            <h2 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">🎵 Effets sonores</h2>
-            <div id="mod-sounds-list" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-    </div>
-
     <button id="secret-btn" title="Accès Modérateur">🔒</button>
 
     <script>
         const SUPABASE_URL = "https://akkgnuoiribtmdignrrs.supabase.co/rest/v1";
-        const SUPABASE_KEY = "sb_secret_NCi0pIpUD2HrFhEktIWStQ_E3eHS9l9";
+        const SUPABASE_KEY = "sb_publishable_tasuDon-Hak26e5QGCSytQ_i06LR-en";
 
         let state = {
             words: [],
@@ -601,14 +575,6 @@
                         const audio = new Audio(randomSound.url);
                         audio.volume = state.settings.volume;
                         audio.play().catch(e => console.log("Son bloqué par le navigateur", e));
-                        if (type === 'click' || type === 'line') {
-                            setTimeout(() => {
-                                try {
-                                    audio.pause();
-                                    audio.src = '';
-                                } catch(err) {}
-                            }, 2000);
-                        }
                     }
                 }
             } catch (e) { console.error("Erreur de chargement des sons :", e); }
@@ -758,7 +724,6 @@
                     saveLocal();
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                     renderGrid();
-                    loadModerationMedia();
                     alert("Mode modérateur activé avec succès !");
                 } else {
                     alert("Code incorrect.");
@@ -809,12 +774,10 @@
             }
             try {
                 const base64 = await fileToBase64(file);
-                const username = localStorage.getItem("twitch_login") || "Anonyme";
                 const ok = await uploadToSupabase('bingo_sounds', {
                     name: file.name,
                     url: base64,
-                    sound_type: type,
-                    uploaded_by: username
+                    sound_type: type
                 });
                 if (ok) {
                     alert("Effet sonore envoyé avec succès et ajouté au tirage aléatoire !");
@@ -836,11 +799,9 @@
             }
             try {
                 const base64 = await fileToBase64(file);
-                const username = localStorage.getItem("twitch_login") || "Anonyme";
                 const ok = await uploadToSupabase('bingo_images', {
                     name: file.name,
-                    url: base64,
-                    uploaded_by: username
+                    url: base64
                 });
                 if (ok) {
                     alert("Visuel de célébration envoyé avec succès et ajouté au tirage aléatoire !");
@@ -849,205 +810,24 @@
             } catch (e) { alert("Erreur de conversion."); }
         });
 
-        // --- LOGIQUE DE MODÉRATION POUR LES ADMINS ---
-        async function loadModerationMedia() {
-            if (!isAdmin) return;
-            
-            const imgList = document.getElementById('mod-images-list');
-            const sndList = document.getElementById('mod-sounds-list');
-            
-            imgList.innerHTML = '<p style="color: #aaa;">Chargement des images...</p>';
-            sndList.innerHTML = '<p style="color: #aaa;">Chargement des sons...</p>';
-            
-            try {
-                // Fetch images
-                const imgRes = await fetch(`${SUPABASE_URL}/bingo_images`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                if (imgRes.ok) {
-                    const images = await imgRes.json();
-                    imgList.innerHTML = '';
-                    if (images.length === 0) {
-                        imgList.innerHTML = '<p style="color: #666; font-size: 13px;">Aucune image de célébration dans la base de données.</p>';
-                    } else {
-                        images.forEach(img => {
-                            const row = document.createElement('div');
-                            row.style = "display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 8px; margin-bottom: 5px;";
-                            
-                            const nameSpan = document.createElement('span');
-                            nameSpan.style = "font-size: 13px; font-family: 'Outfit', sans-serif;";
-                            const uploader = img.uploaded_by || 'Anonyme';
-                            nameSpan.textContent = `${img.name} (par : ${uploader})`;
-                            row.appendChild(nameSpan);
-                            
-                            const delBtn = document.createElement('button');
-                            delBtn.className = 'action-btn danger-btn';
-                            delBtn.style = "padding: 4px 10px; font-size: 12px;";
-                            delBtn.textContent = 'Supprimer';
-                            delBtn.onclick = () => deleteMedia('bingo_images', img.id);
-                            row.appendChild(delBtn);
-                            
-                            imgList.appendChild(row);
-                        });
-                    }
-                }
-                
-                // Fetch sounds
-                const sndRes = await fetch(`${SUPABASE_URL}/bingo_sounds`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                if (sndRes.ok) {
-                    const sounds = await sndRes.json();
-                    sndList.innerHTML = '';
-                    if (sounds.length === 0) {
-                        sndList.innerHTML = '<p style="color: #666; font-size: 13px;">Aucun son dans la base de données.</p>';
-                    } else {
-                        const typesMap = {
-                            click: 'Son Clic',
-                            line: 'Son Ligne',
-                            win: 'Son Bingo'
-                        };
-                        sounds.forEach(snd => {
-                            const row = document.createElement('div');
-                            row.style = "display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 8px; margin-bottom: 5px;";
-                            
-                            const nameSpan = document.createElement('span');
-                            nameSpan.style = "font-size: 13px; font-family: 'Outfit', sans-serif;";
-                            const uploader = snd.uploaded_by || 'Anonyme';
-                            const friendlyType = typesMap[snd.sound_type] || snd.sound_type;
-                            nameSpan.textContent = `[${friendlyType}] ${snd.name} (par : ${uploader})`;
-                            row.appendChild(nameSpan);
-                            
-                            const delBtn = document.createElement('button');
-                            delBtn.className = 'action-btn danger-btn';
-                            delBtn.style = "padding: 4px 10px; font-size: 12px;";
-                            delBtn.textContent = 'Supprimer';
-                            delBtn.onclick = () => deleteMedia('bingo_sounds', snd.id);
-                            row.appendChild(delBtn);
-                            
-                            sndList.appendChild(row);
-                        });
-                    }
-                }
-            } catch(e) {
-                console.error("Error loading moderation media:", e);
-                imgList.innerHTML = '<p style="color: #e74c3c;">Erreur de chargement.</p>';
-                sndList.innerHTML = '<p style="color: #e74c3c;">Erreur de chargement.</p>';
-            }
-        }
-        
-        async function deleteMedia(table, id) {
-            if (!confirm("Voulez-vous vraiment supprimer définitivement ce média ?")) return;
-            try {
-                const res = await fetch(`${SUPABASE_URL}/${table}?id=eq.${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
-                if (res.ok) {
-                    alert("Média supprimé avec succès !");
-                    loadModerationMedia();
-                } else {
-                    alert("Erreur lors de la suppression.");
-                }
-            } catch(e) {
-                console.error("Delete media error:", e);
-                alert("Erreur de connexion.");
-            }
-        }
-
         // --- NAVIGATION DES ONGLETS ---
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 e.target.classList.add('active');
-                const target = e.target.dataset.target;
-                document.getElementById(target).classList.add('active');
-                if (target === 'tab-moderation') {
-                    loadModerationMedia();
-                }
+                document.getElementById(e.target.dataset.target).classList.add('active');
             });
         });
 
-        const TWITCH_CLIENT_ID = "6r33agspeyt1rs5c3iuj820jurbdfb";
-
-        function getRedirectUri() {
-            return window.location.origin + window.location.pathname;
-        }
-
-        async function checkTwitchLogin() {
-            const loginSection = document.getElementById("twitch-login-section");
-            const uploadFormWrapper = document.getElementById("upload-form-wrapper");
-            if (!loginSection) return;
-
-            // 1. Check if token in URL
-            const hash = window.location.hash;
-            if (hash.includes("access_token=")) {
-                const params = new URLSearchParams(hash.substring(1));
-                const token = params.get("access_token");
-                if (token) {
-                    try {
-                        const response = await fetch("https://api.twitch.tv/helix/users", {
-                            headers: {
-                                "Client-ID": TWITCH_CLIENT_ID,
-                                "Authorization": `Bearer ${token}`
-                            }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.data && data.data.length > 0) {
-                                const username = data.data[0].login;
-                                localStorage.setItem("twitch_login", username);
-                                localStorage.setItem("twitch_token", token);
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error fetching Twitch profile:", e);
-                    }
-                    // Clean URL hash
-                    history.pushState("", document.title, window.location.pathname + window.location.search);
-                }
-            }
-
-            const cachedUser = localStorage.getItem("twitch_login");
-            if (cachedUser) {
-                loginSection.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
-                        <span>🟢 Connecté via Twitch : <strong>@${cachedUser}</strong></span>
-                        <button class="action-btn danger-btn" style="padding: 6px 12px; font-size: 13px;" id="twitch-logout-btn">Déconnexion</button>
-                    </div>
-                `;
-                document.getElementById("twitch-logout-btn").addEventListener("click", () => {
-                    localStorage.removeItem("twitch_login");
-                    localStorage.removeItem("twitch_token");
-                    window.location.reload();
-                });
-                if (uploadFormWrapper) uploadFormWrapper.classList.remove("hidden");
-            } else {
-                const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${encodeURIComponent(getRedirectUri())}&response_type=token&scope=`;
-                loginSection.innerHTML = `
-                    <div style="text-align: center; padding: 15px 0;">
-                        <p style="margin-bottom: 15px; color: #aaa;">⚠️ Vous devez vous connecter avec Twitch pour proposer des images ou des sons :</p>
-                        <a href="${authUrl}" class="action-btn" style="text-decoration: none; display: inline-block;">Se connecter avec Twitch</a>
-                    </div>
-                `;
-                if (uploadFormWrapper) uploadFormWrapper.classList.add("hidden");
-            }
-        }
-
         // --- INITIALISATION ---
-        window.onload = async () => {
+        window.onload = () => {
             loadLocal();
-            await checkTwitchLogin();
             
             // Si déjà authentifié
             if (state.settings.secretCode === TARGET_HASH) {
                 isAdmin = true;
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                loadModerationMedia();
             }
 
             // Bind volume slider
