@@ -335,6 +335,46 @@
             margin-right: 15px;
             font-family: 'Outfit', sans-serif;
         }
+        /* Lightbox */
+        #lightbox-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        #lightbox-overlay.open { display: flex; }
+        #lightbox-overlay img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            object-fit: contain;
+            animation: zoomIn 0.2s ease;
+        }
+        #lightbox-close {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            font-size: 36px;
+            color: white;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        #lightbox-close:hover { background: rgba(231,76,60,0.7); }
+        @keyframes zoomIn { from { transform: scale(0.85); opacity:0; } to { transform: scale(1); opacity:1; } }
     </style>
 </head>
 <body>
@@ -352,6 +392,12 @@
     <!-- CELEBRATION OVERLAY -->
     <div id="celebration-overlay">
         <img id="celebration-img" src="" alt="Célébration">
+    </div>
+
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="lightbox-overlay">
+        <button id="lightbox-close" onclick="closeLightbox()" title="Fermer">×</button>
+        <img id="lightbox-img" src="" alt="Vue agrandie">
     </div>
 
     <!-- BINGO TAB -->
@@ -458,8 +504,10 @@
     <script>
         const _u = "MXYvdHNlci9vYy5lc2FiYXB1cy5zcnJuZ2lkbXRiaXJpb3VuZ2trYS8vOnNwdHRo";
         const _k = "bmUtUkw2MGlfUXR5U0NHUTVlNjJrYUgtbm9EdXNhdF9lbGJhaHNpbGJ1cF9icw==";
+        const _ak = "OWw5U0hlM0VfUXRTV0l0a0VoRnJIMkRVcElwMGlDTl90ZXJjZXNfYnM=";
         const SUPABASE_URL = atob(_u).split('').reverse().join('');
         const SUPABASE_KEY = atob(_k).split('').reverse().join('');
+        const SUPABASE_ADMIN_KEY = atob(_ak).split('').reverse().join('');
 
         let state = {
             words: [],
@@ -884,7 +932,11 @@
                             
                             const thumbnail = document.createElement('img');
                             thumbnail.src = img.url;
-                            thumbnail.style = "max-width: 60px; max-height: 60px; border-radius: 6px; object-fit: cover;";
+                            thumbnail.style = "max-width: 60px; max-height: 60px; border-radius: 6px; object-fit: cover; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;";
+                            thumbnail.title = "Cliquer pour agrandir";
+                            thumbnail.onmouseover = () => { thumbnail.style.transform = "scale(1.1)"; thumbnail.style.boxShadow = "0 4px 16px rgba(0,0,0,0.5)"; };
+                            thumbnail.onmouseout = () => { thumbnail.style.transform = "scale(1)"; thumbnail.style.boxShadow = "none"; };
+                            thumbnail.onclick = () => openLightbox(img.url);
                             row.appendChild(thumbnail);
                             
                             const infoDiv = document.createElement('div');
@@ -892,14 +944,15 @@
                             
                             const nameSpan = document.createElement('span');
                             nameSpan.style = "font-size: 13px; font-weight: bold; font-family: 'Outfit', sans-serif;";
-                            nameSpan.textContent = img.name;
+                            const nameStr = img.name || '';
+                            const parMatch = nameStr.match(/\[par:([^\]]+)\]/);
+                            const uploader = parMatch ? parMatch[1] : 'Anonyme';
+                            const cleanName = nameStr.replace(/\s*\[par:[^\]]+\]/g, '').trim();
+                            nameSpan.textContent = cleanName;
                             infoDiv.appendChild(nameSpan);
                             
                             const uploaderSpan = document.createElement('span');
                             uploaderSpan.style = "font-size: 11px; color: #888; font-family: 'Outfit', sans-serif;";
-                            const nameStr = img.name || '';
-                            const parMatch = nameStr.match(/\[par:([^\]]+)\]/);
-                            const uploader = parMatch ? parMatch[1] : 'Anonyme';
                             uploaderSpan.textContent = `proposé par : ${uploader}`;
                             infoDiv.appendChild(uploaderSpan);
                             
@@ -960,15 +1013,16 @@
                             
                             const nameSpan = document.createElement('span');
                             nameSpan.style = "font-size: 13px; font-weight: bold; font-family: 'Outfit', sans-serif;";
+                            const sndNameStr = snd.name || '';
+                            const sndParMatch = sndNameStr.match(/\[par:([^\]]+)\]/);
+                            const uploader = sndParMatch ? sndParMatch[1] : 'Anonyme';
+                            const sndCleanName = sndNameStr.replace(/\s*\[par:[^\]]+\]/g, '').trim();
                             const friendlyType = typesMap[snd.sound_type] || snd.sound_type;
-                            nameSpan.textContent = `[${friendlyType}] ${snd.name}`;
+                            nameSpan.textContent = `[${friendlyType}] ${sndCleanName}`;
                             infoDiv.appendChild(nameSpan);
                             
                             const uploaderSpan = document.createElement('span');
                             uploaderSpan.style = "font-size: 11px; color: #888; font-family: 'Outfit', sans-serif;";
-                            const sndNameStr = snd.name || '';
-                            const sndParMatch = sndNameStr.match(/\[par:([^\]]+)\]/);
-                            const uploader = sndParMatch ? sndParMatch[1] : 'Anonyme';
                             uploaderSpan.textContent = `proposé par : ${uploader}`;
                             infoDiv.appendChild(uploaderSpan);
                             
@@ -992,14 +1046,30 @@
             }
         }
         
+        // --- LIGHTBOX ---
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-overlay').classList.add('open');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox-overlay').classList.remove('open');
+            document.getElementById('lightbox-img').src = '';
+        }
+        document.getElementById('lightbox-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
         async function deleteMedia(table, id) {
             if (!confirm("Voulez-vous vraiment supprimer définitivement ce média ?")) return;
             try {
                 const res = await fetch(`${SUPABASE_URL}/${table}?id=eq.${id}`, {
                     method: 'DELETE',
                     headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                        'apikey': SUPABASE_ADMIN_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`
                     }
                 });
                 if (res.ok) {
@@ -1007,6 +1077,7 @@
                     loadModerationMedia();
                 } else {
                     alert("Erreur lors de la suppression.");
+                    console.error('Delete failed:', res.status, await res.text());
                 }
             } catch(e) {
                 console.error("Delete media error:", e);
