@@ -34,7 +34,7 @@
 
         .main-title {
             font-size: 2.8rem;
-            margin: 10px 0 30px;
+            margin: 10px 0 20px;
             font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -51,7 +51,7 @@
         nav {
             display: flex;
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -125,7 +125,7 @@
             justify-content: center;
             text-align: center;
             padding: 12px;
-            cursor: pointer;
+            cursor: default;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -136,17 +136,11 @@
             user-select: none;
         }
 
-        .bingo-cell::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-20deg);
-            transition: all 0.6s ease;
+        .bingo-cell.admin-mode {
+            cursor: pointer;
         }
 
-        .bingo-cell:hover::before { left: 150%; }
-        .bingo-cell:hover {
+        .bingo-cell.admin-mode:hover {
             transform: translateY(-3px);
             border-color: rgba(255,255,255,0.2);
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
@@ -172,8 +166,36 @@
             pointer-events: none;
         }
 
-        .bingo-cell.checked .bg-image { opacity: 0.3; }
+        .bingo-cell.checked .bg-image { opacity: 0.35; }
         .bingo-cell span { position: relative; z-index: 1; }
+
+        /* Celebration Image Overlay */
+        #celebration-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #celebration-overlay.active {
+            opacity: 1;
+        }
+        #celebration-img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+            transform: scale(0.7);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #celebration-overlay.active #celebration-img {
+            transform: scale(1);
+        }
 
         /* Secret Button */
         #secret-btn {
@@ -207,7 +229,7 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], select {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255,255,255,0.1);
             color: #fff;
@@ -219,7 +241,7 @@
             box-sizing: border-box;
             transition: border-color 0.3s ease;
         }
-        input[type="text"]:focus, input[type="password"]:focus {
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
             border-color: var(--secondary);
         }
         
@@ -262,7 +284,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
             padding-right: 10px;
         }
@@ -284,67 +306,6 @@
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
             color: #fff; cursor: pointer; margin-left: 10px; font-size: 12px; 
             padding: 5px 10px; border-radius: 6px; transition: 0.2s; font-family: 'Outfit', sans-serif;
-        }
-        .word-actions button:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
-
-        /* Grid Size selector pills */
-        .grid-size-selector {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-        
-        .grid-size-btn {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 15px 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Outfit', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .grid-size-btn:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .grid-size-btn.active {
-            background: rgba(17, 17, 255, 0.15);
-            border-color: var(--secondary);
-            box-shadow: inset 0 0 15px rgba(17, 17, 255, 0.2), 0 0 15px rgba(17, 17, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        .grid-size-btn .size-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            transition: all 0.3s ease;
-        }
-
-        .grid-size-btn.active .size-title {
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-        }
-
-        .grid-size-btn .size-desc {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .grid-size-btn.active .size-desc {
-            color: rgba(255, 255, 255, 0.9);
         }
 
         /* File Upload */
@@ -374,8 +335,6 @@
             margin-right: 15px;
             font-family: 'Outfit', sans-serif;
         }
-        input[type="file"]::file-selector-button:hover { background: rgba(255,255,255,0.2); }
-
     </style>
 </head>
 <body>
@@ -383,24 +342,57 @@
     <h1 class="main-title">BROINBLOCK <span>BINGO</span></h1>
 
     <nav id="main-nav">
-        <button class="tab-btn active" data-target="tab-bingo">BINGO</button>
-        <button class="tab-btn hidden admin-only" data-target="tab-modifier">MODIFIER LES CASES</button>
-        <button class="tab-btn hidden admin-only" data-target="tab-parametres">PARAMÈTRES</button>
+        <button class="tab-btn active" data-target="tab-bingo">BINGO (LIVE)</button>
+        <button class="tab-btn" data-target="tab-upload">UPLOADER (SONS & VISUELS)</button>
+        <button class="tab-btn hidden admin-only" data-target="tab-modifier">MODIFIER LES MOTS</button>
+        <button class="tab-btn hidden admin-only" data-target="tab-parametres">PARAMÈTRES ADMIN</button>
     </nav>
+
+    <!-- CELEBRATION OVERLAY -->
+    <div id="celebration-overlay">
+        <img id="celebration-img" src="" alt="Célébration">
+    </div>
 
     <!-- BINGO TAB -->
     <div id="tab-bingo" class="tab-content active">
-        <div class="controls">
+        <div class="controls admin-only hidden">
             <button class="action-btn" id="generate-grid-btn">Générer une nouvelle grille</button>
-            <button class="action-btn hidden admin-only" id="reset-grid-btn">Réinitialiser la grille</button>
+            <button class="action-btn danger-btn" id="reset-grid-btn">Décocher toute la grille</button>
         </div>
         <div class="bingo-grid" id="bingo-grid"></div>
+    </div>
+
+    <!-- UPLOAD TAB -->
+    <div id="tab-upload" class="tab-content">
+        <div class="settings-section">
+            <h2>Uploader un effet sonore (MP3 / WAV)</h2>
+            <div class="file-upload">
+                <label style="width: 100%; margin-bottom: 5px;">Type d'action déclenchant le son :</label>
+                <select id="sound-type-selector" style="margin-bottom: 15px; max-width: 300px;">
+                    <option value="click">Clic sur une case</option>
+                    <option value="line">Ligne/Diagonale complétée</option>
+                    <option value="win">Bingo Complet (Grille pleine)</option>
+                </select>
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <input type="file" id="sound-uploader" accept="audio/*">
+                    <button class="action-btn" id="sound-upload-btn">Envoyer le Son</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Uploader un visuel de célébration (PNG / JPG / GIF)</h2>
+            <div class="file-upload">
+                <input type="file" id="image-uploader" accept="image/*">
+                <button class="action-btn" id="image-upload-btn">Envoyer le Visuel</button>
+            </div>
+        </div>
     </div>
 
     <!-- MODIFIER TAB -->
     <div id="tab-modifier" class="tab-content">
         <div class="settings-section">
-            <h2>Ajouter une case</h2>
+            <h2>Ajouter un mot de case</h2>
             <div style="display: flex; gap: 15px;">
                 <input type="text" id="new-word-input" placeholder="Entrez le texte de la nouvelle case...">
                 <button class="action-btn" id="add-word-btn">Ajouter</button>
@@ -409,8 +401,8 @@
         
         <div class="settings-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 style="margin: 0; border: none;">Liste des mots (<span id="words-count">0</span>)</h2>
-                <button class="action-btn danger-btn" id="reset-words-btn">Reset Global</button>
+                <h2 style="margin: 0; border: none;">Liste globale des mots (<span id="words-count">0</span>)</h2>
+                <button class="action-btn danger-btn" id="reset-words-btn">Tout effacer</button>
             </div>
             <ul class="words-list" id="words-list"></ul>
         </div>
@@ -419,251 +411,46 @@
     <!-- PARAMETRES TAB -->
     <div id="tab-parametres" class="tab-content">
         <div class="settings-section">
-            <h2>Synchronisation Temps Réel (Supabase)</h2>
-            <p style="color: #bbb; font-size: 14px;">Supabase est une alternative open-source à Firebase offrant une base de données PostgreSQL pour une synchronisation en temps réel.</p>
-        </div>
-
-        <div class="settings-section">
-            <h2>Taille de la Grille</h2>
-            <div class="grid-size-selector">
-                <button class="grid-size-btn" data-size="3">
-                    <span class="size-title">3x3</span>
-                    <span class="size-desc">9 mots</span>
-                </button>
-                <button class="grid-size-btn" data-size="4">
-                    <span class="size-title">4x4</span>
-                    <span class="size-desc">16 mots</span>
-                </button>
-                <button class="grid-size-btn active" data-size="5">
-                    <span class="size-title">5x5</span>
-                    <span class="size-desc">25 mots</span>
-                </button>
-            </div>
-            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 10px; font-style: italic;">* Changer la taille nécessitera de générer une nouvelle grille dans l'onglet BINGO.</p>
-        </div>
-
-        <div class="settings-section">
-            <h2>Affichage (OBS)</h2>
-            <div class="file-upload">
-                <label>Couleur de fond (ex: Vert Chroma) :</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="color" id="obs-bg-color" value="#121212" style="width: 50px; height: 40px; padding: 0; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
-                    <button class="action-btn" id="apply-bg-btn">Appliquer</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h2>Médias & Sons (Stockage Local)</h2>
-            <p style="color: #bbb; font-size: 13px; margin-top: 0;">Attention: Fichiers de petite taille recommandés (limite localStorage ~5Mo). Les médias sont conservés sur ce navigateur.</p>
+            <h2>Volume Général</h2>
             <div class="file-upload">
                 <label>Volume des sons :</label>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <input type="range" id="volume-slider" min="0" max="100" value="100" style="width: 150px; cursor: pointer;">
+                <div style="display: flex; gap: 15px; align-items: center; width: 100%; margin-top: 10px;">
+                    <input type="range" id="volume-slider" min="0" max="100" value="100" style="flex: 1; cursor: pointer;">
                     <span id="volume-display" style="font-weight: bold; width: 45px; text-align: right;">100%</span>
                 </div>
             </div>
-            <div class="file-upload">
-                <label>Image de fond (Case cochée) :</label>
-                <input type="file" id="upload-image" accept="image/*">
-            </div>
-            <div class="file-upload">
-                <label>Son : Clic sur une case :</label>
-                <input type="file" id="upload-click-sound" accept="audio/*">
-            </div>
-            <div class="file-upload">
-                <label>Son : Ligne/Colonne complétée :</label>
-                <input type="file" id="upload-line-sound" accept="audio/*">
-            </div>
-            <div class="file-upload">
-                <label>Son : Bingo (Grille pleine) :</label>
-                <input type="file" id="upload-win-sound" accept="audio/*">
-            </div>
+        </div>
+        <div class="settings-section">
+            <h2>Configuration de la Grille</h2>
+            <label>Taille de la Grille (ex: 5 pour 5x5) :</label>
+            <input type="text" id="grid-size-input" value="5" style="margin-top: 10px;">
         </div>
     </div>
 
     <button id="secret-btn" title="Accès Modérateur">🔒</button>
 
     <script>
-        /*
-         * ==========================================
-         *  LOGIQUE ET ETAT GLOBAL
-         * ==========================================
-         */
+        const SUPABASE_URL = "https://cilkbaxftxsslzkitzxp.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpbGtiYXhmdHhzc2x6a2l0enhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjM3NzQsImV4cCI6MjA5Mzk5OTc3NH0.C8E3wp3zqRIVBztqSRwXDq_Xi9MnNIBC6bxNjcbnhmU";
+
         let state = {
             words: [],
-            grid: [], // Mots de la grille actuelle
-            checked: [], // Statut de cases cochées
+            grid: [],
+            checked: [],
             settings: {
                 secretCode: '',
-                obsBg: '#121212',
                 volume: 1.0,
-                gridSize: 5,
-                media: {
-                    image: null,
-                    clickSound: null,
-                    lineSound: null,
-                    winSound: null
-                }
+                gridSize: 5
             }
         };
 
         let previousCompletedLines = 0;
         let isAdmin = false;
-
-        // --- GESTION DU STOCKAGE LOCAL (LocalStorage) ---
-        function loadState() {
-            try {
-                const saved = localStorage.getItem('bingoStateBroinblock');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    state.words = parsed.words || [];
-                    state.grid = parsed.grid || [];
-                    state.checked = parsed.checked || [];
-                    if (parsed.settings) {
-                        state.settings.secretCode = parsed.settings.secretCode || '';
-                        state.settings.obsBg = parsed.settings.obsBg || '#121212';
-                        state.settings.volume = parsed.settings.volume !== undefined ? parsed.settings.volume : 1.0;
-                        state.settings.gridSize = parsed.settings.gridSize || 5;
-                        state.settings.media = parsed.settings.media || state.settings.media;
-                    }
-                }
-            } catch (e) {
-                console.error("Erreur de chargement du localStorage:", e);
-            }
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem('bingoStateBroinblock', JSON.stringify(state));
-            } catch (e) {
-                console.error("Erreur de sauvegarde (quota dépassé ?):", e);
-                alert("Erreur de sauvegarde locale. Les fichiers médias sont peut-être trop lourds.");
-            }
-        }
-
-
         let isSyncing = false;
-        let lastLocalActionTime = 0; // Prevent polling from overwriting recent local changes
+        let lastLocalActionTime = 0;
 
-        // URL et Clé publique Supabase (Nouveau compte)
-        const SUPABASE_URL = "https://akkgnuoiribtmdignrrs.supabase.co/rest/v1/bingo_rooms";
-        const SUPABASE_KEY = "sb_publishable_tasuDon-Hak26e5QGCSytQ_i06LR-en";
-
-        async function pushSync() {
-            if (!state.settings.secretCode || !isAdmin) return; // Seul l'admin pousse les modifs pour éviter les conflits
-            isSyncing = true;
-            lastLocalActionTime = Date.now(); // Mark the time of our local modification
-            try {
-                await fetch(SUPABASE_URL, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'resolution=merge-duplicates'
-                    },
-                    body: JSON.stringify({
-                        room_hash: state.settings.secretCode,
-                        state: {
-                            grid: state.grid,
-                            checked: state.checked,
-                            words: state.words,
-                            timestamp: Date.now()
-                        }
-                    })
-                });
-            } catch (error) {
-                console.error("Erreur Push Sync:", error);
-            }
-            isSyncing = false;
-        }
-
-        async function pullSync() {
-            if (!state.settings.secretCode || isSyncing) return;
-            // Ignore les données entrantes si on a poussé une modif il y a moins de 3 secondes (évite le reset buggé)
-            if (Date.now() - lastLocalActionTime < 3000) return; 
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}?room_hash=eq.${state.settings.secretCode}&select=state`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const rows = await response.json();
-                    if (rows && rows.length > 0) {
-                        const data = rows[0].state;
-                        if (data && data.timestamp) {
-                            const localCheck = JSON.stringify(state.checked);
-                            const remoteCheck = JSON.stringify(data.checked);
-                            const localGrid = JSON.stringify(state.grid);
-                            const remoteGrid = JSON.stringify(data.grid);
-                            const localWords = JSON.stringify(state.words);
-                            const remoteWords = JSON.stringify(data.words || []);
-                            
-                            // Si l'état distant est différent
-                            if (localCheck !== remoteCheck || localGrid !== remoteGrid || localWords !== remoteWords) {
-                                state.grid = data.grid || state.grid;
-                                state.checked = data.checked || state.checked;
-                                
-                                if (localWords !== remoteWords && data.words) {
-                                    state.words = data.words;
-                                    renderWords();
-                                }
-                                
-                                // Vérification des sons (uniquement si la grille n'a pas été regénérée)
-                                if (localGrid === remoteGrid) {
-                                    let newCompletedLines = getCompletedLinesCount();
-                                    let localCheckedCount = (localCheck.match(/true/g) || []).length;
-                                    let remoteCheckedCount = (remoteCheck.match(/true/g) || []).length;
-
-                                    if (newCompletedLines > previousCompletedLines) {
-                                        if (state.checked.every(c => c)) playSound('win');
-                                        else playSound('line');
-                                    } else if (remoteCheckedCount > localCheckedCount) {
-                                        playSound('click');
-                                    }
-                                    previousCompletedLines = newCompletedLines;
-                                } else {
-                                    previousCompletedLines = getCompletedLinesCount();
-                                }
-                                
-                                saveState();
-                                renderGrid();
-                            }
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Erreur Pull Sync:", error);
-            }
-        }
-
-        // Polling toutes les 3 secondes pour récupérer les mises à jour
-        setInterval(pullSync, 3000);
-
-        /*
-         * ==========================================
-         *  INTERFACE UTILISATEUR & LOGIQUE
-         * ==========================================
-         */
-
-        // Navigation par onglets (SPA)
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById(e.target.dataset.target).classList.add('active');
-            });
-        });
-
-        // Hash SHA-256 attendu (évite d'exposer le mot de passe en clair dans le code F12)
-        const TARGET_HASH = "9108e69976148c23876957f796ba9446d204b0172750277025ae1b3384db2571";
-
+        // --- CRYPTO HASH CODE SECRET (SHA-256) ---
+        const TARGET_HASH = "9108e69976148c23876957f796ba9446d204b0172750277025ae1b3384db2571"; // Hash de ton mot de passe modérateur
         async function hashString(str) {
             const encoder = new TextEncoder();
             const data = encoder.encode(str);
@@ -672,43 +459,204 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Déverrouillage Admin
-        document.getElementById('secret-btn').addEventListener('click', async () => {
-            const code = prompt("Entrez le Code Secret pour activer le mode Modérateur :");
-            if (code) {
-                const hash = await hashString(code);
-                if (hash === TARGET_HASH) {
-                    state.settings.secretCode = hash;
-                    isAdmin = true;
-                    saveState();
-                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                    alert("Accès autorisé. Mode Modérateur activé. Vous contrôlez la grille !");
-                    pushSync(); // Force une synchro initiale
-                } else {
-                    alert("Accès refusé. Code secret incorrect.");
-                }
+        // --- CHARGEMENT / SAUVEGARDE LOCALE ---
+        function loadLocal() {
+            const saved = localStorage.getItem('bingoStateBroinblock');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.words = parsed.words || [];
+                    state.settings.volume = parsed.settings?.volume !== undefined ? parsed.settings.volume : 1.0;
+                    state.settings.gridSize = parsed.settings?.gridSize || 5;
+                    state.settings.secretCode = parsed.settings?.secretCode || '';
+                } catch(e) { console.error(e); }
             }
-        });
+        }
+        function saveLocal() {
+            localStorage.setItem('bingoStateBroinblock', JSON.stringify({
+                words: state.words,
+                settings: state.settings
+            }));
+        }
 
-        // Calcul des lignes gagnantes
-        function getCompletedLinesCount() {
-            const size = Math.sqrt(state.grid.length) || 5;
-            const lines = [];
+        // --- SYNCHRONISATION SUPABASE ---
+        async function pushSync() {
+            if (!isAdmin || isSyncing) return;
+            isSyncing = true;
+            lastLocalActionTime = Date.now();
+            try {
+                await fetch(`${SUPABASE_URL}/bingo_rooms`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        room_hash: 'default_room',
+                        state: {
+                            grid: state.grid,
+                            checked: state.checked,
+                            words: state.words,
+                            gridSize: state.settings.gridSize,
+                            timestamp: Date.now()
+                        }
+                    })
+                });
+            } catch (error) { console.error("Push Sync Error:", error); }
+            isSyncing = false;
+        }
+
+        async function pullSync() {
+            if (isSyncing || Date.now() - lastLocalActionTime < 2500) return;
+            try {
+                const response = await fetch(`${SUPABASE_URL}/bingo_rooms?room_hash=eq.default_room&select=state`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                if (response.ok) {
+                    const rows = await response.json();
+                    if (rows && rows.length > 0) {
+                        const data = rows[0].state;
+                        if (data && data.timestamp) {
+                            const localCheck = JSON.stringify(state.checked);
+                            const remoteCheck = JSON.stringify(data.checked || []);
+                            const localGrid = JSON.stringify(state.grid);
+                            const remoteGrid = JSON.stringify(data.grid || []);
+
+                            if (localCheck !== remoteCheck || localGrid !== remoteGrid) {
+                                state.grid = data.grid || [];
+                                state.checked = data.checked || [];
+                                state.words = data.words || state.words;
+                                state.settings.gridSize = data.gridSize || state.settings.gridSize;
+                                
+                                // Si c'est une mise à jour d'état (case cochée), on joue le son / image au hasard
+                                if (localGrid === remoteGrid && localCheck !== remoteCheck) {
+                                    let newCompletedLines = getCompletedLinesCount();
+                                    let localCount = (localCheck.match(/true/g) || []).length;
+                                    let remoteCount = (remoteCheck.match(/true/g) || []).length;
+
+                                    if (newCompletedLines > previousCompletedLines) {
+                                        if (state.checked.every(c => c)) triggerCelebration('win');
+                                        else triggerCelebration('line');
+                                    } else if (remoteCount > localCount) {
+                                        triggerCelebration('click');
+                                    }
+                                    previousCompletedLines = newCompletedLines;
+                                } else {
+                                    previousCompletedLines = getCompletedLinesCount();
+                                }
+                                renderGrid();
+                            }
+                        }
+                    }
+                }
+            } catch (error) { console.error("Pull Sync Error:", error); }
+        }
+
+        // Polling en arrière-plan toutes les 2 secondes
+        setInterval(pullSync, 2000);
+
+        // --- CÉLÉBRATION ALÉATOIRE (SONS & VISUELS DEPUIS SUPABASE) ---
+        async function triggerCelebration(type) {
+            // 1. Audio aléatoire depuis Supabase
+            try {
+                const response = await fetch(`${SUPABASE_URL}/bingo_sounds?sound_type=eq.${type}`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                if (response.ok) {
+                    const sounds = await response.json();
+                    if (sounds && sounds.length > 0) {
+                        const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+                        const audio = new Audio(randomSound.url);
+                        audio.volume = state.settings.volume;
+                        audio.play().catch(e => console.log("Son bloqué par le navigateur", e));
+                    }
+                }
+            } catch (e) { console.error("Erreur de chargement des sons :", e); }
+
+            // 2. Visuel aléatoire pour les célébrations d'impact (line et win) ou click
+            if (type === 'line' || type === 'win') {
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/bingo_images`, {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                    });
+                    if (response.ok) {
+                        const images = await response.json();
+                        if (images && images.length > 0) {
+                            const randomImage = images[Math.floor(Math.random() * images.length)];
+                            const overlay = document.getElementById('celebration-overlay');
+                            const img = document.getElementById('celebration-img');
+                            
+                            img.src = randomImage.url;
+                            overlay.classList.add('active');
+                            
+                            setTimeout(() => {
+                                overlay.classList.remove('active');
+                            }, type === 'win' ? 8000 : 4000); // 8 secondes pour grille gagnée, 4s pour ligne
+                        }
+                    }
+                } catch(e) { console.error("Erreur de chargement des images :", e); }
+            }
+        }
+
+        // --- RENDU DE LA GRILLE ---
+        function renderGrid() {
+            const container = document.getElementById('bingo-grid');
+            container.innerHTML = '';
+            const size = state.settings.gridSize || 5; 
+            container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
             
+            for (let i = 0; i < state.grid.length; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell' + (state.checked[i] ? ' checked' : '');
+                if (isAdmin) cell.classList.add('admin-mode');
+
+                const text = document.createElement('span');
+                text.textContent = state.grid[i] || '';
+                cell.appendChild(text);
+                
+                if (isAdmin) {
+                    cell.addEventListener('click', () => {
+                        state.checked[i] = !state.checked[i];
+                        saveLocal();
+                        renderGrid();
+
+                        if (state.checked[i]) {
+                            let newCompletedLines = getCompletedLinesCount();
+                            if (state.checked.every(c => c)) triggerCelebration('win');
+                            else if (newCompletedLines > previousCompletedLines) triggerCelebration('line');
+                            else triggerCelebration('click');
+                            previousCompletedLines = newCompletedLines;
+                        } else {
+                            previousCompletedLines = getCompletedLinesCount();
+                        }
+                        pushSync();
+                    });
+                }
+                container.appendChild(cell);
+            }
+        }
+
+        // Calcul des lignes complétées
+        function getCompletedLinesCount() {
+            const size = state.settings.gridSize || 5;
+            const lines = [];
             // Lignes
             for (let i = 0; i < size; i++) {
                 let row = [];
                 for (let j = 0; j < size; j++) row.push(i * size + j);
                 lines.push(row);
             }
-            
             // Colonnes
             for (let i = 0; i < size; i++) {
                 let col = [];
                 for (let j = 0; j < size; j++) col.push(j * size + i);
                 lines.push(col);
             }
-            
             // Diagonales
             let diag1 = [], diag2 = [];
             for (let i = 0; i < size; i++) {
@@ -717,185 +665,45 @@
             }
             lines.push(diag1);
             lines.push(diag2);
-
             return lines.filter(line => line.every(idx => state.checked[idx])).length;
         }
 
-        function playSound(type) {
-            // Lecture depuis la nouvelle clé ou l'ancienne si le fichier était déjà sauvegardé
-            let base64Audio = state.settings.media[`${type}Sound`] || state.settings.media[type];
-            if (base64Audio) {
-                let audio = new Audio(base64Audio);
-                audio.volume = state.settings.volume !== undefined ? state.settings.volume : 1.0;
-                audio.play().catch(e => console.log("Son bloqué par le navigateur:", e));
-            }
-        }
-
-        // --- ONGLET BINGO ---
-        function renderGrid() {
-            const container = document.getElementById('bingo-grid');
-            container.innerHTML = '';
-            
-            // Déduit la taille (3, 4 ou 5) depuis le nombre de mots dans la grille actuelle
-            const size = Math.sqrt(state.grid.length) || 5; 
-            container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-            
-            for (let i = 0; i < state.grid.length; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'bingo-cell' + (state.checked[i] ? ' checked' : '');
-                
-                const bg = document.createElement('div');
-                bg.className = 'bg-image';
-                if (state.settings.media.image) {
-                    bg.style.backgroundImage = `url(${state.settings.media.image})`;
-                }
-                
-                const text = document.createElement('span');
-                text.textContent = state.grid[i] || '';
-                
-                cell.appendChild(bg);
-                cell.appendChild(text);
-                
-                cell.addEventListener('click', () => {
-                    toggleCell(i);
-                });
-                container.appendChild(cell);
-            }
-        }
-
-        function toggleCell(index) {
-            state.checked[index] = !state.checked[index];
-            saveState();
-            renderGrid();
-            
-            if (state.checked[index]) {
-                let newCompletedLines = getCompletedLinesCount();
-                if (state.checked.every(c => c)) {
-                    playSound('win');
-                } else if (newCompletedLines > previousCompletedLines) {
-                    playSound('line');
+        // --- GESTION DU MOT DE PASSE ADMIN ---
+        document.getElementById('secret-btn').addEventListener('click', async () => {
+            const code = prompt("Entrez le code secret pour activer le mode modérateur :");
+            if (code) {
+                const hash = await hashString(code);
+                if (hash === TARGET_HASH) {
+                    isAdmin = true;
+                    state.settings.secretCode = hash;
+                    saveLocal();
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    renderGrid();
+                    alert("Mode modérateur activé avec succès !");
                 } else {
-                    playSound('click');
+                    alert("Code incorrect.");
                 }
-                previousCompletedLines = newCompletedLines;
-            } else {
-                previousCompletedLines = getCompletedLinesCount();
             }
-            
-            pushSync();
+        });
+
+        // --- UPLOADS DES VIEWERS VERS SUPABASE (BASE64) ---
+        async function uploadToSupabase(table, payload) {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/${table}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                return response.ok;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
         }
-
-        document.getElementById('generate-grid-btn').addEventListener('click', () => {
-            const size = state.settings.gridSize || 5;
-            const requiredWords = size * size;
-            
-            if (state.words.length < requiredWords) {
-                alert(`Il faut au moins ${requiredWords} mots pour générer une grille de ${size}x${size} ! (Actuel: ${state.words.length})`);
-                return;
-            }
-            if(confirm(`Voulez-vous générer une nouvelle grille aléatoire en ${size}x${size} ?`)) {
-                const shuffled = [...state.words].sort(() => 0.5 - Math.random());
-                state.grid = shuffled.slice(0, requiredWords);
-                state.checked = Array(requiredWords).fill(false);
-                previousCompletedLines = 0;
-                saveState();
-                renderGrid();
-                pushSync();
-            }
-        });
-
-        document.getElementById('reset-grid-btn').addEventListener('click', () => {
-            if(confirm("Décocher toutes les cases de la grille actuelle ?")) {
-                state.checked = Array(state.grid.length || 25).fill(false);
-                previousCompletedLines = 0;
-                saveState();
-                renderGrid();
-                pushSync();
-            }
-        });
-
-        // --- ONGLET MODIFIER ---
-        function renderWords() {
-            const list = document.getElementById('words-list');
-            list.innerHTML = '';
-            
-            const requiredWords = (state.settings.gridSize || 5) * (state.settings.gridSize || 5);
-            document.getElementById('words-count').textContent = state.words.length + ` / ${requiredWords} requis`;
-            document.getElementById('words-count').style.color = state.words.length < requiredWords ? '#e74c3c' : '#2ecc71';
-            
-            state.words.forEach((word, index) => {
-                const li = document.createElement('li');
-                li.className = 'word-item';
-                
-                const span = document.createElement('span');
-                span.textContent = word;
-                
-                const actions = document.createElement('div');
-                actions.className = 'word-actions';
-                
-                const editBtn = document.createElement('button');
-                editBtn.innerHTML = 'Modifier';
-                editBtn.onclick = () => {
-                    const newWord = prompt("Modifier le texte :", word);
-                    if (newWord && newWord.trim()) {
-                        state.words[index] = newWord.trim();
-                        saveState();
-                        renderWords();
-                        pushSync();
-                    }
-                };
-                
-                const delBtn = document.createElement('button');
-                delBtn.innerHTML = 'Supprimer';
-                delBtn.onclick = () => {
-                    state.words.splice(index, 1);
-                    saveState();
-                    renderWords();
-                    pushSync();
-                };
-                
-                actions.appendChild(editBtn);
-                actions.appendChild(delBtn);
-                li.appendChild(span);
-                li.appendChild(actions);
-                
-                list.appendChild(li);
-            });
-        }
-
-        document.getElementById('add-word-btn').addEventListener('click', () => {
-            const input = document.getElementById('new-word-input');
-            const val = input.value.trim();
-            if (val) {
-                state.words.push(val);
-                input.value = '';
-                saveState();
-                renderWords();
-                pushSync();
-            }
-        });
-        
-        // Permettre l'ajout avec la touche Entrée
-        document.getElementById('new-word-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('add-word-btn').click();
-        });
-
-        document.getElementById('reset-words-btn').addEventListener('click', () => {
-            if(confirm("ATTENTION : Cela va supprimer TOUS les mots de la liste définitivement. Continuer ?")) {
-                state.words = [];
-                saveState();
-                renderWords();
-                pushSync();
-            }
-        });
-
-        // --- ONGLET PARAMETRES ---
-        document.getElementById('apply-bg-btn').addEventListener('click', () => {
-            const color = document.getElementById('obs-bg-color').value;
-            state.settings.obsBg = color;
-            document.body.style.backgroundColor = color;
-            saveState();
-        });
 
         // Conversion Fichier -> Base64
         function fileToBase64(file) {
@@ -907,82 +715,194 @@
             });
         }
 
-        async function handleMediaUpload(event, key) {
-            const file = event.target.files[0];
-            if (file) {
-                // Limite 2Mo pour le stockage local
-                if (file.size > 2 * 1024 * 1024) {
-                    alert("Fichier trop volumineux. Veuillez choisir un fichier de moins de 2Mo pour le stockage local.");
-                    event.target.value = ''; // Reset
-                    return;
-                }
-                try {
-                    const base64 = await fileToBase64(file);
-                    state.settings.media[key] = base64;
-                    saveState();
-                    if(key === 'image') renderGrid();
-                    alert("Fichier chargé avec succès !");
-                } catch(e) {
-                    console.error(e);
-                    alert("Erreur lors de la lecture du fichier.");
-                }
+        document.getElementById('sound-upload-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('sound-uploader');
+            const type = document.getElementById('sound-type-selector').value;
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Veuillez sélectionner un fichier audio !");
+                return;
             }
-        }
+            const file = fileInput.files[0];
+            if (file.size > 3 * 1024 * 1024) {
+                alert("Fichier trop volumineux. Limite de 3 Mo pour les sons.");
+                return;
+            }
+            try {
+                const base64 = await fileToBase64(file);
+                const ok = await uploadToSupabase('bingo_sounds', {
+                    name: file.name,
+                    url: base64,
+                    sound_type: type
+                });
+                if (ok) {
+                    alert("Effet sonore envoyé avec succès et ajouté au tirage aléatoire !");
+                    fileInput.value = '';
+                } else alert("Erreur d'envoi.");
+            } catch (e) { alert("Erreur de conversion."); }
+        });
 
-        document.getElementById('upload-image').addEventListener('change', e => handleMediaUpload(e, 'image'));
-        document.getElementById('upload-click-sound').addEventListener('change', e => handleMediaUpload(e, 'clickSound'));
-        document.getElementById('upload-line-sound').addEventListener('change', e => handleMediaUpload(e, 'lineSound'));
-        document.getElementById('upload-win-sound').addEventListener('change', e => handleMediaUpload(e, 'winSound'));
+        document.getElementById('image-upload-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('image-uploader');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Veuillez sélectionner une image !");
+                return;
+            }
+            const file = fileInput.files[0];
+            if (file.size > 3 * 1024 * 1024) {
+                alert("Fichier trop volumineux. Limite de 3 Mo pour les images.");
+                return;
+            }
+            try {
+                const base64 = await fileToBase64(file);
+                const ok = await uploadToSupabase('bingo_images', {
+                    name: file.name,
+                    url: base64
+                });
+                if (ok) {
+                    alert("Visuel de célébration envoyé avec succès et ajouté au tirage aléatoire !");
+                    fileInput.value = '';
+                } else alert("Erreur d'envoi.");
+            } catch (e) { alert("Erreur de conversion."); }
+        });
+
+        // --- NAVIGATION DES ONGLETS ---
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.target).classList.add('active');
+            });
+        });
 
         // --- INITIALISATION ---
         window.onload = () => {
-            loadState();
-            previousCompletedLines = getCompletedLinesCount();
+            loadLocal();
             
-            // Appliquer le fond
-            document.body.style.backgroundColor = state.settings.obsBg;
-            document.getElementById('obs-bg-color').value = state.settings.obsBg;
-            
-            // Appliquer le volume
-            document.getElementById('volume-slider').value = (state.settings.volume !== undefined ? state.settings.volume : 1.0) * 100;
+            // Si déjà authentifié
+            if (state.settings.secretCode === TARGET_HASH) {
+                isAdmin = true;
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+            }
+
+            // Bind volume slider
+            document.getElementById('volume-slider').value = state.settings.volume * 100;
             document.getElementById('volume-display').textContent = `${document.getElementById('volume-slider').value}%`;
             document.getElementById('volume-slider').addEventListener('input', (e) => {
                 const val = e.target.value;
                 document.getElementById('volume-display').textContent = `${val}%`;
                 state.settings.volume = val / 100;
-                saveState();
+                saveLocal();
             });
 
-            // Appliquer la taille de la grille (Pills)
-            const gridBtns = document.querySelectorAll('.grid-size-btn');
-            const currentSize = state.settings.gridSize || 5;
-            
-            gridBtns.forEach(btn => {
-                if (parseInt(btn.dataset.size) === currentSize) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-                
-                btn.addEventListener('click', (e) => {
-                    gridBtns.forEach(b => b.classList.remove('active'));
-                    const targetBtn = e.currentTarget;
-                    targetBtn.classList.add('active');
-                    state.settings.gridSize = parseInt(targetBtn.dataset.size);
-                    saveState();
-                    renderWords(); // Met à jour le compteur "requis"
-                });
+            // Bind grid size config
+            document.getElementById('grid-size-input').value = state.settings.gridSize;
+            document.getElementById('grid-size-input').addEventListener('change', (e) => {
+                state.settings.gridSize = parseInt(e.target.value) || 5;
+                saveLocal();
             });
-            
-            // Si la session est déjà validée (hash correct), on débloque automatiquement
-            if (typeof TARGET_HASH !== 'undefined' && state.settings.secretCode === TARGET_HASH) {
-                isAdmin = true;
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-            }
-            
+
+            // Boutons Admin
+            document.getElementById('generate-grid-btn').addEventListener('click', () => {
+                const size = state.settings.gridSize || 5;
+                const req = size * size;
+                if (state.words.length < req) {
+                    alert(`Il faut au moins ${req} mots en liste (Actuel: ${state.words.length}) !`);
+                    return;
+                }
+                if (confirm(`Générer une grille ${size}x${size} ?`)) {
+                    const shuf = [...state.words].sort(() => 0.5 - Math.random());
+                    state.grid = shuf.slice(0, req);
+                    state.checked = Array(req).fill(false);
+                    previousCompletedLines = 0;
+                    renderGrid();
+                    pushSync();
+                }
+            });
+
+            document.getElementById('reset-grid-btn').addEventListener('click', () => {
+                if (confirm("Décocher toutes les cases ?")) {
+                    state.checked = Array(state.grid.length).fill(false);
+                    previousCompletedLines = 0;
+                    renderGrid();
+                    pushSync();
+                }
+            });
+
+            // Onglet liste de mots
             renderWords();
             renderGrid();
+            pullSync();
         };
+
+        function renderWords() {
+            const list = document.getElementById('words-list');
+            if (!list) return;
+            list.innerHTML = '';
+            const size = state.settings.gridSize || 5;
+            const req = size * size;
+            document.getElementById('words-count').textContent = `${state.words.length} / ${req} requis`;
+            document.getElementById('words-count').style.color = state.words.length < req ? '#e74c3c' : '#2ecc71';
+
+            state.words.forEach((w, idx) => {
+                const li = document.createElement('li');
+                li.className = 'word-item';
+                const span = document.createElement('span');
+                span.textContent = w;
+                li.appendChild(span);
+
+                const acts = document.createElement('div');
+                acts.className = 'word-actions';
+                
+                const edit = document.createElement('button');
+                edit.textContent = 'Modifier';
+                edit.onclick = () => {
+                    const val = prompt("Texte :", w);
+                    if (val && val.trim()) {
+                        state.words[idx] = val.trim();
+                        saveLocal();
+                        renderWords();
+                        pushSync();
+                    }
+                };
+                acts.appendChild(edit);
+
+                const del = document.createElement('button');
+                del.textContent = 'Supprimer';
+                del.style.background = '#e74c3c';
+                del.onclick = () => {
+                    state.words.splice(idx, 1);
+                    saveLocal();
+                    renderWords();
+                    pushSync();
+                };
+                acts.appendChild(del);
+
+                li.appendChild(acts);
+                list.appendChild(li);
+            });
+        }
+
+        document.getElementById('add-word-btn').addEventListener('click', () => {
+            const inp = document.getElementById('new-word-input');
+            const val = inp.value.trim();
+            if (val) {
+                state.words.push(val);
+                inp.value = '';
+                saveLocal();
+                renderWords();
+                pushSync();
+            }
+        });
+
+        document.getElementById('reset-words-btn').addEventListener('click', () => {
+            if (confirm("Supprimer tous les mots ?")) {
+                state.words = [];
+                saveLocal();
+                renderWords();
+                pushSync();
+            }
+        });
     </script>
 </body>
 </html>
