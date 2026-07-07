@@ -1049,7 +1049,7 @@
                         const username = data.data[0].login;
                         localStorage.setItem("twitch_login", username);
                         localStorage.setItem("twitch_token", token);
-                        window.location.reload();
+                        window.location.href = window.location.pathname + window.location.search;
                         return true;
                     }
                 }
@@ -1071,7 +1071,6 @@
                 const token = params.get("access_token");
                 if (token) {
                     await handleTwitchToken(token);
-                    history.pushState("", document.title, window.location.pathname + window.location.search);
                 }
             }
 
@@ -1095,48 +1094,8 @@
                     <div style="text-align: center; padding: 15px 0;">
                         <p style="margin-bottom: 15px; color: #aaa;">⚠️ Vous devez vous connecter avec Twitch pour proposer des images ou des sons :</p>
                         <a href="${authUrl}" class="action-btn" style="text-decoration: none; display: inline-block;">Se connecter avec Twitch</a>
-                        
-                        <div style="margin-top: 15px; font-size: 12px;">
-                            <a href="#" id="toggle-manual-token" style="color: #7f00ff; text-decoration: underline;">Problème de connexion locale ? Cliquez ici</a>
-                            <div id="manual-token-container" class="hidden" style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; align-items: center;">
-                                <input type="text" id="manual-token-input" placeholder="Collez l'URL finale avec le jeton..." style="font-size: 12px; padding: 5px 10px; flex: 1; max-width: 250px; background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; border-radius: 4px;">
-                                <button class="action-btn" id="manual-token-submit" style="padding: 5px 10px; font-size: 12px;">Valider</button>
-                            </div>
-                        </div>
                     </div>
                 `;
-                
-                document.getElementById("toggle-manual-token").addEventListener("click", (e) => {
-                    e.preventDefault();
-                    const container = document.getElementById("manual-token-container");
-                    if (container.classList.contains("hidden")) {
-                        container.classList.remove("hidden");
-                    } else {
-                        container.classList.add("hidden");
-                    }
-                });
-                
-                document.getElementById("manual-token-submit").addEventListener("click", async () => {
-                    const val = document.getElementById("manual-token-input").value.trim();
-                    if (val) {
-                        let token = val;
-                        if (val.includes("access_token=")) {
-                            const hashPart = val.substring(val.indexOf("access_token="));
-                            const params = new URLSearchParams(hashPart);
-                            token = params.get("access_token");
-                        }
-                        if (token) {
-                            const ok = await handleTwitchToken(token);
-                            if (ok) {
-                                alert("Connexion réussie !");
-                            } else {
-                                alert("Jeton invalide ou erreur de connexion Twitch.");
-                            }
-                        } else {
-                            alert("Format d'URL ou de jeton invalide.");
-                        }
-                    }
-                });
                 
                 if (uploadFormWrapper) uploadFormWrapper.classList.add("hidden");
             }
