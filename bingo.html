@@ -604,6 +604,21 @@
             }
         }
 
+        let cachedImages = [];
+        async function fetchImagesCache() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/bingo_images`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                if (response.ok) {
+                    cachedImages = await response.json();
+                }
+            } catch(e) { console.error("Erreur cache images :", e); }
+        }
+
+        // Object holding assigned images per cell index to keep them consistent during renders
+        let assignedCellImages = {};
+
         // --- RENDU DE LA GRILLE ---
         function renderGrid() {
             const container = document.getElementById('bingo-grid');
@@ -616,8 +631,37 @@
                 cell.className = 'bingo-cell' + (state.checked[i] ? ' checked' : '');
                 if (isAdmin) cell.classList.add('admin-mode');
 
+                // Si la case est cochée et que nous avons des images en cache
+                if (state.checked[i]) {
+                    if (!assignedCellImages[i] && cachedImages.length > 0) {
+                        // Assigner une image au hasard pour cette case
+                        const randImg = cachedImages[Math.floor(Math.random() * cachedImages.length)];
+                        assignedCellImages[i] = randImg.url;
+                    }
+                    
+                    if (assignedCellImages[i]) {
+                        // Créer un conteneur de fond pour l'image
+                        const bg = document.createElement('div');
+                        bg.className = 'bg-image';
+                        bg.style.backgroundImage = `url(${assignedCellImages[i]})`;
+                        bg.style.position = 'absolute';
+                        bg.style.top = '0'; bg.style.left = '0'; bg.style.right = '0'; bg.style.bottom = '0';
+                        bg.style.backgroundSize = 'cover';
+                        bg.style.backgroundPosition = 'center';
+                        bg.style.opacity = '0.35';
+                        bg.style.pointerEvents = 'none';
+                        bg.style.zIndex = '0';
+                        cell.appendChild(bg);
+                    }
+                } else {
+                    // Supprimer l'image assignée si la case est décochée
+                    delete assignedCellImages[i];
+                }
+
                 const text = document.createElement('span');
                 text.textContent = state.grid[i] || '';
+                text.style.position = 'relative';
+                text.style.zIndex = '1';
                 cell.appendChild(text);
                 
                 if (isAdmin) {
