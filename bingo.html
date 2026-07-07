@@ -817,10 +817,9 @@
             try {
                 const base64 = await fileToBase64(file);
                 const ok = await uploadToSupabase('bingo_sounds', {
-                    name: file.name,
+                    name: file.name + ' [par:' + username + ']',
                     url: base64,
-                    sound_type: type,
-                    uploaded_by: username
+                    sound_type: type
                 });
                 if (ok) {
                     alert("Effet sonore envoyé avec succès et ajouté au tirage aléatoire !");
@@ -848,9 +847,8 @@
             try {
                 const base64 = await fileToBase64(file);
                 const ok = await uploadToSupabase('bingo_images', {
-                    name: file.name,
-                    url: base64,
-                    uploaded_by: username
+                    name: file.name + ' [par:' + username + ']',
+                    url: base64
                 });
                 if (ok) {
                     alert("Visuel de célébration envoyé avec succès et ajouté au tirage aléatoire !");
@@ -899,7 +897,9 @@
                             
                             const uploaderSpan = document.createElement('span');
                             uploaderSpan.style = "font-size: 11px; color: #888; font-family: 'Outfit', sans-serif;";
-                            const uploader = img.uploaded_by || 'Anonyme';
+                            const nameStr = img.name || '';
+                            const parMatch = nameStr.match(/\[par:([^\]]+)\]/);
+                            const uploader = parMatch ? parMatch[1] : 'Anonyme';
                             uploaderSpan.textContent = `proposé par : ${uploader}`;
                             infoDiv.appendChild(uploaderSpan);
                             
@@ -966,7 +966,9 @@
                             
                             const uploaderSpan = document.createElement('span');
                             uploaderSpan.style = "font-size: 11px; color: #888; font-family: 'Outfit', sans-serif;";
-                            const uploader = snd.uploaded_by || 'Anonyme';
+                            const sndNameStr = snd.name || '';
+                            const sndParMatch = sndNameStr.match(/\[par:([^\]]+)\]/);
+                            const uploader = sndParMatch ? sndParMatch[1] : 'Anonyme';
                             uploaderSpan.textContent = `proposé par : ${uploader}`;
                             infoDiv.appendChild(uploaderSpan);
                             
