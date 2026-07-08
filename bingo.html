@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2.5 - lightbox + delete fix -->
+<!-- v2.6 - lightbox + delete fix + disable line visual celebration -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -664,8 +664,8 @@
                 }
             } catch (e) { console.error("Erreur de chargement des sons :", e); }
 
-            // 2. Visuel aléatoire pour les célébrations d'impact (line et win) ou click
-            if (type === 'line' || type === 'win') {
+            // 2. Visuel aléatoire pour les célébrations d'impact (uniquement win pour éviter les overlays intrusifs au clic)
+            if (type === 'win') {
                 try {
                     const response = await fetch(`${SUPABASE_URL}/bingo_images`, {
                         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -682,7 +682,7 @@
                             
                             setTimeout(() => {
                                 overlay.classList.remove('active');
-                            }, type === 'win' ? 8000 : 4000); // 8 secondes pour grille gagnée, 4s pour ligne
+                            }, 8000); // 8 secondes pour grille gagnée
                         }
                     }
                 } catch(e) { console.error("Erreur de chargement des images :", e); }
