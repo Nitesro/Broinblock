@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2.6 - lightbox + delete fix + disable line visual celebration -->
+<!-- v2.7 - lightbox + delete fix via public key RLS + disable line visual celebration -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -505,10 +505,8 @@
     <script>
         const _u = "MXYvdHNlci9vYy5lc2FiYXB1cy5zcnJuZ2lkbXRiaXJpb3VuZ2trYS8vOnNwdHRo";
         const _k = "bmUtUkw2MGlfUXR5U0NHUTVlNjJrYUgtbm9EdXNhdF9lbGJhaHNpbGJ1cF9icw==";
-        const _ak = "OWw5U0hlM0VfUXRTV0l0a0VoRnJIMkRVcElwMGlDTl90ZXJjZXNfYnM=";
         const SUPABASE_URL = atob(_u).split('').reverse().join('');
         const SUPABASE_KEY = atob(_k).split('').reverse().join('');
-        const SUPABASE_ADMIN_KEY = atob(_ak).split('').reverse().join('');
 
         let state = {
             words: [],
@@ -1069,8 +1067,8 @@
                 const res = await fetch(`${SUPABASE_URL}/${table}?id=eq.${id}`, {
                     method: 'DELETE',
                     headers: {
-                        'apikey': SUPABASE_ADMIN_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
                     }
                 });
                 if (res.ok) {
